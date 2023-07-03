@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.File;
+import java.net.URL;
 
 @RestController
 @RequestMapping("/v1/api/image")
@@ -20,14 +21,15 @@ public class ImageController {
     private final FileParserServiceImpl fileParserService;
 
 
-    @GetMapping(value = "/{name}/{surname}")
+    @GetMapping(value = "/{name}/{surname}/{\\w\\.\\w}")
     public FileSystemResource getHttpImageLink(@PathVariable String name, @PathVariable String surname){
         File file = new File("C:\\Users\\lenovo\\Documents\\Resume\\1672815113084-GraduateDev_AssessmentCsv_Ref003.csv");
         fileParserService.parseCSV(file);
         var accountProfile = accountProfileRepository.getByNameAndSurname(name, surname);
         if (accountProfile != null) {
 
-            File imageFile = new File(accountProfile.getHttpImageLink().substring(5));
+            File imageFile = new File(accountProfile.getHttpImageLink().substring(11));
+            URL imageUrl = fileParserService.createImageLink(imageFile);
             return new FileSystemResource(imageFile);
         } else {
             return null;

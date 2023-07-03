@@ -66,7 +66,9 @@ public class FileParserServiceImpl implements FileParserService {
                             //byte[] imageBytes = Base64.getDecoder().decode(imageData);
 
 
-                            String httpImageLink = convertCSVDataToImage(base64ImageData).toURI().toURL().toString();
+                            File imageFile = convertCSVDataToImage(base64ImageData);
+
+                            String httpImageLink = createImageLink(imageFile).toString();
 
                             pstmt.setString(1, name);
                             pstmt.setString(2, surname);
@@ -75,8 +77,6 @@ public class FileParserServiceImpl implements FileParserService {
                             pstmt.executeUpdate();
                         } catch (SQLException e) {
                             e.printStackTrace();
-                        } catch (MalformedURLException e) {
-                            throw new RuntimeException(e);
                         }
                     });
         } catch (SQLException | IOException e) {
@@ -99,7 +99,7 @@ public class FileParserServiceImpl implements FileParserService {
     @Override
     public URL createImageLink(File fileImage) {
         try {
-            return new URL("http://localhost:8090/v1/api/image/" + fileImage.getName());
+            return new URL("http://localhost:8090/com.eviro.assessment.grad001.nkosanamdlalose/" + fileImage.getName());
         } catch (MalformedURLException e) {
             e.printStackTrace();
             return null;
