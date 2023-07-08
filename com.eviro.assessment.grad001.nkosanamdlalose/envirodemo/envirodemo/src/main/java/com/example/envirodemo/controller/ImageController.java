@@ -28,9 +28,8 @@ public class ImageController {
         var accountProfile = accountProfileRepository.getByNameAndSurname(name, surname);
         if (accountProfile != null) {
 
-            File imageFile = new File(accountProfile.getHttpImageLink().substring(11));
-            URL imageUrl = fileParserService.createImageLink(imageFile);
-            return new FileSystemResource(imageFile);
+
+            return new FileSystemResource(accountProfile.getHttpImageLink());
         } else {
             return null;
         }

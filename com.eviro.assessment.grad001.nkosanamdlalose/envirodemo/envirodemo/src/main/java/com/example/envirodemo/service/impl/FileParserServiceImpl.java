@@ -42,44 +42,34 @@ public class FileParserServiceImpl implements FileParserService {
     @Autowired
     private AccountProfileRepository accountProfileRepository;
 
-
-
-    private static final String DB_URL = "jdbc:h2:mem:testdb";
-    private static final String DB_USER = "sa";
-    private static final String DB_PASSWORD = "1234";
-
     @Override
     public void parseCSV(File csvFile) {
-        try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
-            String sql = "INSERT INTO ACCOUNT_PROFILE  (NAME, SURNAME, HTTP_IMAGE_LINK) VALUES (?, ?, ?)";
-            PreparedStatement pstmt = conn.prepareStatement(sql);
+        try (Reader reader = new FileReader(csvFile)) {
+            CsvToBean<CsvRecord> csvToBean = new CsvToBeanBuilder<CsvRecord>(reader)
+                    .withType(CsvRecord.class)
+                    .withIgnoreLeadingWhiteSpace(true)
+                    .build();
 
-            Files.lines(Paths.get(csvFile.getAbsolutePath()))
-                    .skip(1) // skip header row
-                    .map(line -> line.split(","))
-                    .forEach(data -> {
-                        try {
-                            String name = data[0];
-                            String surname = data[1];
-                            String imageFormat = data[2];
-                            String base64ImageData = data[3];
-                            //byte[] imageBytes = Base64.getDecoder().decode(imageData);
+            List<CsvRecord> records = csvToBean.parse();
 
+            for (CsvRecord record : records) {
+                String name = record.getName();
+                String surname = record.getSurname();
+                String imageFormat = record.getImageFormat();
+                String base64ImageData = record.getImageData();
 
-                            File imageFile = convertCSVDataToImage(base64ImageData);
+                File imageFile = convertCSVDataToImage(base64ImageData);
 
-                            String httpImageLink = createImageLink(imageFile).toString();
+                String httpImageLink = createImageLink(imageFile).toString();
 
-                            pstmt.setString(1, name);
-                            pstmt.setString(2, surname);
-                            pstmt.setString(3, httpImageLink);
+                AccountProfile accountProfile = new AccountProfile();
+                accountProfile.setName(name);
+                accountProfile.setSurname(surname);
+                accountProfile.setHttpImageLink(httpImageLink);
 
-                            pstmt.executeUpdate();
-                        } catch (SQLException e) {
-                            e.printStackTrace();
-                        }
-                    });
-        } catch (SQLException | IOException e) {
+                accountProfileRepository.save(accountProfile);
+            }
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
