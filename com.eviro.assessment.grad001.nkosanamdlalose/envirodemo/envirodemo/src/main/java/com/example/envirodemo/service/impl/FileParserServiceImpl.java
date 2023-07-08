@@ -89,7 +89,7 @@ public class FileParserServiceImpl implements FileParserService {
     @Override
     public URL createImageLink(File fileImage) {
         try {
-            return new URL("http://localhost:8090/com.eviro.assessment.grad001.nkosanamdlalose/" + fileImage.getName());
+            return new URL("file://" + fileImage.getAbsolutePath());
         } catch (MalformedURLException e) {
             e.printStackTrace();
             return null;
