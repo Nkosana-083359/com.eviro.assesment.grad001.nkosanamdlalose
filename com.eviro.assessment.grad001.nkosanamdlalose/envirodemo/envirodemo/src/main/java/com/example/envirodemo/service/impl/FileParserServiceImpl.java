@@ -77,7 +77,7 @@ public class FileParserServiceImpl implements FileParserService {
     @Override
     public File convertCSVDataToImage(String base64ImageData) {
         byte[] imageData = Base64.getDecoder().decode(base64ImageData);
-        Path imagePath = Paths.get("image.jpg");
+        Path imagePath = Paths.get("image.jpeg");
         try {
             Files.write(imagePath, imageData);
         } catch (IOException e) {
@@ -94,6 +94,12 @@ public class FileParserServiceImpl implements FileParserService {
             e.printStackTrace();
             return null;
         }
+    }
+
+    @Override
+    public void callParseCSV() {
+        File csvFile = new File("1672815113084-GraduateDev_AssessmentCsv_Ref003.csv");
+        parseCSV(csvFile);
     }
 
 }
