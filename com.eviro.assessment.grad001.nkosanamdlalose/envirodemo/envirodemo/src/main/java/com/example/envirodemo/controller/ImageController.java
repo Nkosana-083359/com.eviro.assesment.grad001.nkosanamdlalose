@@ -3,12 +3,11 @@ package com.example.envirodemo.controller;
 import com.example.envirodemo.repository.AccountProfileRepository;
 import com.example.envirodemo.service.impl.FileParserServiceImpl;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.File;
-import java.net.URL;
+
 
 @RestController
 @RequestMapping("/v1/api/image")
@@ -23,9 +22,8 @@ public class ImageController {
         fileParserService.callParseCSV();
         var accountProfile = accountProfileRepository.getByNameAndSurname(name, surname);
         if (accountProfile != null) {
+return new FileSystemResource(accountProfile.getHttpImageLink().substring(22));
 
-
-            return new FileSystemResource(accountProfile.getHttpImageLink().substring(5));
         } else {
             return null;
         }
