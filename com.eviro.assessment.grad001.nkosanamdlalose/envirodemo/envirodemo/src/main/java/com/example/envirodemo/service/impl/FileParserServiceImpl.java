@@ -15,8 +15,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
-import java.net.MalformedURLException;
-import java.net.URL;
+import java.net.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -60,7 +59,10 @@ public class FileParserServiceImpl implements FileParserService {
 
                 File imageFile = convertCSVDataToImage(base64ImageData);
 
-                String httpImageLink = createImageLink(imageFile).toString();
+                URL fileURL = createImageLink(imageFile);
+
+                String httpImageLink = fileURL.toURI().toURL().toString();
+
 
                 AccountProfile accountProfile = new AccountProfile();
                 accountProfile.setName(name);
@@ -71,13 +73,15 @@ public class FileParserServiceImpl implements FileParserService {
             }
         } catch (IOException e) {
             e.printStackTrace();
+        } catch (URISyntaxException e) {
+            throw new RuntimeException(e);
         }
     }
 
     @Override
     public File convertCSVDataToImage(String base64ImageData) {
         byte[] imageData = Base64.getDecoder().decode(base64ImageData);
-        Path imagePath = Paths.get("image.jpeg");
+        Path imagePath = Paths.get("image.png");
         try {
             Files.write(imagePath, imageData);
         } catch (IOException e) {
@@ -89,7 +93,10 @@ public class FileParserServiceImpl implements FileParserService {
     @Override
     public URL createImageLink(File fileImage) {
         try {
-            return new URL("file://" + fileImage.getAbsolutePath());
+
+
+
+            return new URL("http://localhost:8090/"+ fileImage.getName());
         } catch (MalformedURLException e) {
             e.printStackTrace();
             return null;
